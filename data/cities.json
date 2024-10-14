@@ -1,0 +1,51 @@
+[
+  {
+    "CityName": {
+      "EN-US": "Thetford",
+      "RU-RU": "Тэтфорд"
+    },
+    "Index": "1"
+  },
+  {
+    "CityName": {
+      "EN-US": "Lymhurst",
+      "RU-RU": "Люм"
+    },
+    "Index": "2"
+  },
+  {
+    "CityName": {
+      "EN-US": "Bridgewatch",
+      "RU-RU": "Бридж"
+    },
+    "Index": "3"
+  },
+  {
+    "CityName": {
+      "EN-US": "Fort_Sterling",
+      "RU-RU": "Форт"
+    },
+    "Index": "4"
+  },
+  {
+    "CityName": {
+      "EN-US": "Martlock",
+      "RU-RU": "Мартлок"
+    },
+    "Index": "5"
+  },
+  {
+    "CityName": {
+      "EN-US": "Caerleon",
+      "RU-RU": "Карлеон"
+    },
+    "Index": "6"
+  },
+  {
+    "CityName": {
+      "EN-US": "Brecilien",
+      "RU-RU": "Бресильен"
+    },
+    "Index": "7"
+  }
+]

@@ -37,5 +37,4 @@ class XMLDataItemList extends XMLData
         }
         return false;
     }
-
 }

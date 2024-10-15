@@ -21,8 +21,8 @@ class Preparation
 
         $this->parameters = [
             'countOfItems' => $inputDataArray[0],
-            'tier' => array_pop($itemNamesAndTier),
-            'itemUniqueNames' => $itemNamesAndTier,
+            'itemTier' => array_pop($itemNamesAndTier),
+            'itemNamesFromInput' => $itemNamesAndTier,
             'statisticType' => $cityAndStat['statisticType'],
             'cityName' => $cityAndStat['cityName']
         ];

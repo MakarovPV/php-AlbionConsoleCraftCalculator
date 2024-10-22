@@ -6,7 +6,6 @@
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/database" isTestSource="false" packagePrefix="Database\" />
-      <sourceFolder url="file://$MODULE_DIR$/commands" isTestSource="false" packagePrefix="Commands\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/open-telemetry/api" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/open-telemetry/context" />

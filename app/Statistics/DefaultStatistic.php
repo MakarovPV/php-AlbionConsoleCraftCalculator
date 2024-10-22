@@ -8,8 +8,11 @@ class DefaultStatistic extends Statistic
 {
     public function dataOfMainItem(array $namesOfMainItem)
     {
-        echo 'Стоимость одного предмета ' . $namesOfMainItem['rusName'] . ' составляет ' .
-            Calculate::calculate(1, $this->getItemCostFromApi($namesOfMainItem['uniqueName'], $this->cityName)) . " серебра. \nПоиск данных по ресурсам для его создания:\n";
+        $this->mainItemCost = Calculate::calculate(1, $this->getItemCostFromApi($namesOfMainItem['uniqueName'], $this->cityName));
+        echo 'Стоимость одного предмета ' . $namesOfMainItem['rusName'] . ' составляет ' . $this->mainItemCost . "\n" .
+            'Стоимость с 6.5% налогом: ' . $this->mainItemCost * 0.935 . " серебра.\n" .
+            "Поиск данных по ресурсам для его создания:\n";
+
     }
 
     public function build()
@@ -24,7 +27,9 @@ class DefaultStatistic extends Statistic
             $costItem .
             " серебра. \n";
         }
-        $str .= "Общая стоимость ресурсов: " . $totalCost . ' серебра.';
+        $str .= "Общая стоимость ресурсов: " . $totalCost . " серебра.\n" .
+            'Общая стоимость с 24.8% возвратом ресурсов: ' . $totalCost * 0.752 . " серебра. Примерный профит составляет " . Calculate::percentageBalance($this->mainItemCost * 0.935, $totalCost * 0.752) . "%\n" .
+            'Общая стоимость с 15.2% возвратом ресурсов: ' . $totalCost * 0.848 . " серебра. Примерный профит составляет " . Calculate::percentageBalance($this->mainItemCost * 0.935, $totalCost * 0.848) . "%\n";
         return $str;
     }
 }

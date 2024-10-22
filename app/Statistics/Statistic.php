@@ -11,6 +11,7 @@ abstract class Statistic
     protected string $cityName;
     private AlbionResourceCost $api;
     private Items $elastic;
+    protected int $mainItemCost = 0;
 
     public function __construct(array $itemsArray, string $cityName)
     {

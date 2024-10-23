@@ -4,6 +4,15 @@ namespace App\Commands;
 
 Interface CommandInterface
 {
+    /**
+     * Запуск команды.
+     */
     public function run();
-    public function notification();
+
+
+    /**
+     * Оповещение об успешном выполнении команды.
+     * @return string
+     */
+    public function notification(): string;
 }

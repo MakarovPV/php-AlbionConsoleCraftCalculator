@@ -4,12 +4,24 @@ namespace App\Utils;
 
 class Calculate
 {
-    public static function calculate(int $countItems, int $costItem)
+    /**
+     * Без комментариев.
+     * @param int $countItems
+     * @param int $costItem
+     * @return int
+     */
+    public static function calculate(int $countItems, int $costItem): int
     {
         return $countItems * $costItem;
     }
 
-    public static function percentageBalance(float $firstNumber, float $secondNumber)
+    /**
+     * Вычисление процентной разницы между 2 значениями.
+     * @param float $firstNumber
+     * @param float $secondNumber
+     * @return float|int|string
+     */
+    public static function percentageBalance(float $firstNumber, float $secondNumber): float|int|string
     {
         if ($secondNumber == 0) {
             return "Некорректные данные.";

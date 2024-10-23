@@ -13,6 +13,11 @@ abstract class Statistic
     private Items $elastic;
     protected int $mainItemCost = 0;
 
+    /**
+     * Первым аргументом передаётся массив со сгенерированными данными из xml-файла.
+     * @param array $itemsArray
+     * @param string $cityName
+     */
     public function __construct(array $itemsArray, string $cityName)
     {
         $this->api = new AlbionResourceCost();
@@ -21,7 +26,11 @@ abstract class Statistic
         $this->cityName = $cityName;
     }
 
-    abstract public function build();
+    /**
+     * Генерация статистики по комплектующим предметам для вывода в консоль.
+     * @return string
+     */
+    abstract public function build(): string;
 
     protected function getItemCostFromApi(string $uniqueName, string $cityName = 'Thetford')
     {

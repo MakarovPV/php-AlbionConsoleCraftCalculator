@@ -4,16 +4,27 @@ namespace App\Utils;
 
 class TrimArray
 {
-    public static function trimArrayForElastic(array $array)
+    /**
+     * Извлечение из строки названия предмета и его уровня.
+     * @param array $array
+     * @return array|null
+     */
+    public static function trimArrayForElastic(array $array): array|null
     {
         $trimArray = [];
         foreach (array_slice($array, 1) as $item){
             $trimArray[] = $item;
             if(is_numeric($item)) return $trimArray;
         }
+        return null;
     }
 
-    public static function getStatTypeAndCityName(array $array)
+    /**
+     * Извлечение из строки типа статистики и названия города.
+     * @param array $array
+     * @return array
+     */
+    public static function getStatTypeAndCityName(array $array): array
     {
         $statTypeAndCityName = [];
         for($i=1; $i<count($array); $i++){

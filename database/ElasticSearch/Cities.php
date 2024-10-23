@@ -24,7 +24,14 @@ class Cities extends Elastic
         ]);
     }
 
-    public function search(array $cityName)
+    /**
+     * Поиск города в эластике. Во входящем массиве содержится либо сокращенное русское название города, либо уже полное английское.
+     * При нахождении получаем массив с его наименованием на русском и английском языках.
+     * Английское название используется для получения по нему данных из API.
+     * @param array $cityName
+     * @return array|null
+     */
+    public function search(array $cityName): array|null
     {
         $params = [
             'index' => $this->getIndex(),

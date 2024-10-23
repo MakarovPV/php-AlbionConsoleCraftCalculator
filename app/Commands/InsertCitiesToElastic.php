@@ -11,8 +11,8 @@ class InsertCitiesToElastic extends Command
         parent::__construct(new Cities(), 'data/cities.json');
     }
 
-    public function notification()
+    public function notification(): string
     {
-        echo 'Данные по городам загружены';
+        return 'Данные по городам загружены';
     }
 }

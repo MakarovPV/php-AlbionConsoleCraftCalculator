@@ -27,7 +27,13 @@ class Items extends Elastic
         ]);
     }
 
-    public function search(array $itemNamesAndTier)
+    /**
+     * Поиск предмета в эластике. Входящий массив содержит в себе название искомого предмета из 1 или нескольких слов и его уровень.
+     * При нахождении получаем массив с его наименованием на русском языке и уникальным именем для получения по нему данных из API.
+     * @param array $itemNamesAndTier
+     * @return array|null
+     */
+    public function search(array $itemNamesAndTier): array|null
     {
         $itemNames = $itemNamesAndTier['itemNames'];
         $tierItem = $itemNamesAndTier['tier'];

@@ -5,6 +5,9 @@ namespace App;
 use App\Utils\TrimArray;
 use Database\ElasticSearch\Cities;
 
+/**
+ * Класс, предназначенный для получения данных из консоли и преобразования их в более удобный и понятный вид.
+ */
 class Preparation
 {
     private array $parameters = [];
@@ -14,10 +17,10 @@ class Preparation
         $this->extractParametersFromConsoleInput($inputDataArray);
     }
 
-    public function extractParametersFromConsoleInput(array $inputDataArray)
+    public function extractParametersFromConsoleInput(array $inputDataArray): void
     {
         $itemNamesAndTier = TrimArray::trimArrayForElastic($inputDataArray);
-        $cityAndStat = $this->getData(TrimArray::getStatTypeAndCityName($inputDataArray));
+        $cityAndStat = $this->getStatisticTypeAndCityName(TrimArray::getStatTypeAndCityName($inputDataArray));
 
         $this->parameters = [
             'countOfItems' => $inputDataArray[0],
@@ -28,7 +31,7 @@ class Preparation
         ];
     }
 
-    public function getData(array $array)
+    public function getStatisticTypeAndCityName(array $array): array
     {
         if($this->getStatisticTypeNameFromInput($array[0])) {
             list($statisticType, $cityName) = $array;
@@ -42,36 +45,38 @@ class Preparation
         ];
     }
 
-    private function getStatisticTypeNameFromInput(?string $statisticType)
-{
-    if(!$statisticType) $statisticType = 'default';
-    $className = "\App\Statistics\\".ucfirst($statisticType) . 'Statistic';
+    private function getStatisticTypeNameFromInput(?string $statisticType): string|false
+    {
+        if(!$statisticType) $statisticType = 'default';
+        $className = "\App\Statistics\\".ucfirst($statisticType) . 'Statistic';
 
-    if (class_exists($className)) {
-        return $className;
+        if (class_exists($className)) {
+            return $className;
+        }
+        return false;
     }
-    return false;
-}
 
-    private function getCityNameFromInput(?string $cityName)
+    private function getEngCityName(string $cityName): string
+    {
+        $cities = new Cities();
+        return $cities->search([$cityName])['enName'];
+    }
+
+    private function getCityNameFromInput(?string $cityName): string
     {
         if(!$cityName) $cityName = 'Thetford';
         return $cityName;
     }
 
-    public function __get(string $parameterName)
+    public function __get(string $parameterName): mixed
     {
         return $this->getParameter($parameterName);
     }
 
-    public function getParameter(string $parameterName)
+    public function getParameter(string $parameterName): mixed
     {
         return $this->parameters[$parameterName];
     }
 
-    private function getEngCityName(string $cityName)
-    {
-        $cities = new Cities();
-        return $cities->search([$cityName])['enName'];
-    }
+
 }

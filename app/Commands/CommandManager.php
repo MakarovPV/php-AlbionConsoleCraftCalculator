@@ -2,6 +2,9 @@
 
 namespace App\Commands;
 
+/**
+ * Класс для автоматизации запуска команд.
+ */
 class CommandManager
 {
     private array $commands = [];
@@ -20,7 +23,7 @@ class CommandManager
     {
         foreach($this->commands as $command) {
             $command->run();
-            $command->notification();
+            echo $command->notification();
         }
     }
 }

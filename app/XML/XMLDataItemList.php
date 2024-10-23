@@ -6,11 +6,20 @@ class XMLDataItemList extends XMLData
 {
     private array $itemTypes = ['simpleitem', 'consumableitem', 'equipmentitem', 'weapon', 'mount'];
 
+    /**
+     * xml-файл, из которого будут извлекаться комплектующие для крафта предмета.
+     */
     public function __construct()
     {
         parent::__construct('data/items.xml');
     }
 
+    /**
+     * Заполнение массива данными по искомому предмету и его комплектующим из xml-файла.
+     * @param string $searchValue
+     * @param int $count
+     * @return string
+     */
     public function generateItems(string $searchValue, int $count)
     {
         $itemType = $this->selectItemType($searchValue);
@@ -24,8 +33,13 @@ class XMLDataItemList extends XMLData
         }
     }
 
-    //поиск в xml файле по тикеру
-    private function selectItemType(string $searchValue)
+    /**
+     * Проверка на наличие искомого предмета среди имеющихся типов крафтовых предметов.
+     * Если предмет является не крафтовым, а базовым (не является создаваемым предметом), то возвращается false.
+     * @param string $searchValue
+     * @return array|false|false[]|\SimpleXMLElement[]
+     */
+    private function selectItemType(string $searchValue): array|false
     {
         foreach ($this->itemTypes as $item){
             $foundItems = $this->xml->xpath("//$item

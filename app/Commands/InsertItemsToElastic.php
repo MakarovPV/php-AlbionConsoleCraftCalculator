@@ -11,8 +11,8 @@ class InsertItemsToElastic extends Command
         parent::__construct(new Items(), 'data/items.json');
     }
 
-    public function notification()
+    public function notification(): string
     {
-        echo 'Данные по предметам загружены';
+        return 'Данные по предметам загружены';
     }
 }

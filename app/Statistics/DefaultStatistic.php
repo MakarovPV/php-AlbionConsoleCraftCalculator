@@ -6,7 +6,12 @@ use App\Utils\Calculate;
 
 class DefaultStatistic extends Statistic
 {
-    public function dataOfMainItem(array $namesOfMainItem)
+    /**
+     * Получение данных по основному предмету и вывод их в консоль.
+     * @param array $namesOfMainItem
+     * @return void
+     */
+    public function dataOfMainItem(array $namesOfMainItem): void
     {
         $this->mainItemCost = Calculate::calculate(1, $this->getItemCostFromApi($namesOfMainItem['uniqueName'], $this->cityName));
         echo 'Стоимость одного предмета ' . $namesOfMainItem['rusName'] . ' составляет ' . $this->mainItemCost . "\n" .
@@ -15,7 +20,7 @@ class DefaultStatistic extends Statistic
 
     }
 
-    public function build()
+    public function build(): string
     {
         $str = '';
         $totalCost = 0;

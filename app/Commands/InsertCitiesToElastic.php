@@ -13,6 +13,6 @@ class InsertCitiesToElastic extends Command
 
     public function notification(): string
     {
-        return 'Данные по городам загружены';
+        return "Данные по городам загружены. \n";
     }
 }

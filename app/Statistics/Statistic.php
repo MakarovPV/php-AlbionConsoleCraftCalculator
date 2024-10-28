@@ -3,10 +3,14 @@
 namespace App\Statistics;
 
 use App\Api\AlbionResourceCost;
+use App\Traits\Calculate;
 use Database\ElasticSearch\Items;
+
 
 abstract class Statistic
 {
+    use Calculate;
+
     protected array $itemsArray;
     protected string $cityName;
     private AlbionResourceCost $api;

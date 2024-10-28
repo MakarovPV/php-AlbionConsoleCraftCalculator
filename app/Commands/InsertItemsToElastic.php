@@ -13,6 +13,6 @@ class InsertItemsToElastic extends Command
 
     public function notification(): string
     {
-        return 'Данные по предметам загружены';
+        return "Данные по предметам загружены. \n";
     }
 }

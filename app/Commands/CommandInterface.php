@@ -9,7 +9,6 @@ Interface CommandInterface
      */
     public function run();
 
-
     /**
      * Оповещение об успешном выполнении команды.
      * @return string

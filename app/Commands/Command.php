@@ -2,11 +2,13 @@
 
 namespace App\Commands;
 
-use App\Utils\JsonDecoder;
+use App\Traits\JsonDecoder;
 use Database\ElasticSearch\Elastic;
 
 abstract class Command implements CommandInterface
 {
+    use JsonDecoder;
+
     protected Elastic $elastic;
     protected string $fileNameWithData;
 
@@ -23,6 +25,7 @@ abstract class Command implements CommandInterface
 
     public function run()
     {
-        $this->elastic->insertAllDocuments(JsonDecoder::getDataFromJson($this->fileNameWithData));
+        $this->elastic->createIndex();
+        $this->elastic->insertAllDocuments($this->getDataFromJson($this->fileNameWithData));
     }
 }

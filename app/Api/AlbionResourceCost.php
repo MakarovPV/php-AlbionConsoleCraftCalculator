@@ -2,10 +2,11 @@
 
 namespace App\Api;
 
-use App\Utils\JsonDecoder;
+use App\Traits\JsonDecoder;
 
 class AlbionResourceCost
 {
+    use JsonDecoder;
     /**
      * Получение стоимости предмета.
      * @param string $resourceName
@@ -15,7 +16,7 @@ class AlbionResourceCost
     public function getCostByItemName(string $resourceName, string $cityName)
     {
         $url = "https://old.west.albion-online-data.com/api/v1/stats/Prices/$resourceName.json?locations=$cityName";
-        $dataFromApi = JsonDecoder::getDataFromJson($url);
+        $dataFromApi = $this->getDataFromJson($url);
 
         return $dataFromApi[0]['sell_price_min'];
     }

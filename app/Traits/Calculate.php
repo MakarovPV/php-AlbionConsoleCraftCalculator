@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Utils;
+namespace App\Traits;
 
-class Calculate
+trait Calculate
 {
     /**
      * Без комментариев.
@@ -10,7 +10,7 @@ class Calculate
      * @param int $costItem
      * @return int
      */
-    public static function calculate(int $countItems, int $costItem): int
+    protected function calculate(int $countItems, int $costItem): int
     {
         return $countItems * $costItem;
     }
@@ -21,7 +21,7 @@ class Calculate
      * @param float $secondNumber
      * @return float|int|string
      */
-    public static function percentageBalance(float $firstNumber, float $secondNumber): float|int|string
+    protected function percentageBalance(float $firstNumber, float $secondNumber): float|int|string
     {
         if ($secondNumber == 0) {
             return "Некорректные данные.";

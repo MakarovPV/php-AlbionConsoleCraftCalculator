@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Utils\TrimArray;
+use App\Traits\TrimArray;
 use Database\ElasticSearch\Cities;
 
 /**
@@ -10,6 +10,8 @@ use Database\ElasticSearch\Cities;
  */
 class Preparation
 {
+    use TrimArray;
+
     private array $parameters = [];
 
     public function __construct(array $inputDataArray)
@@ -19,8 +21,8 @@ class Preparation
 
     public function extractParametersFromConsoleInput(array $inputDataArray): void
     {
-        $itemNamesAndTier = TrimArray::trimArrayForElastic($inputDataArray);
-        $cityAndStat = $this->getStatisticTypeAndCityName(TrimArray::getStatTypeAndCityName($inputDataArray));
+        $itemNamesAndTier = $this->trimArrayForElastic($inputDataArray);
+        $cityAndStat = $this->getStatisticTypeAndCityName($this->getStatTypeAndCityName($inputDataArray));
 
         $this->parameters = [
             'countOfItems' => $inputDataArray[0],

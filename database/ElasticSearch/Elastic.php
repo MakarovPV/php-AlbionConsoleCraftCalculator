@@ -28,6 +28,24 @@ abstract class Elastic
     }
 
     /**
+     * Создание индекса в эластике.
+     * @return \Elastic\Elasticsearch\Response\Elasticsearch|\Http\Promise\Promise|null
+     */
+    public function createIndex()
+    {
+        $params = [
+            'index' => $this->getIndex(),
+        ];
+
+        try {
+            return $this->client->indices()->create($params);
+        } catch(\Exception $e) {
+            echo 'Ошибка';
+            return null;
+        }
+    }
+
+    /**
      * Заполнение индекса эластика документами. Используется в командах и выполняется при первом запуске проекта.
      * @param array $array
      * @return void

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Utils;
+namespace App\Traits;
 
-class JsonDecoder
+trait JsonDecoder
 {
     /**
      * Декодирование json-файла в массив.
      * @param string $path
      * @return array
      */
-    public static function getDataFromJson(string $path): array
+    protected function getDataFromJson(string $path): array
     {
         $jsonData = file_get_contents($path);
         if (!$jsonData)  die('Ошибка при получении данных');

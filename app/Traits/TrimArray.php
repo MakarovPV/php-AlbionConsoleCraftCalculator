@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Utils;
+namespace App\Traits;
 
-class TrimArray
+trait TrimArray
 {
     /**
      * Извлечение из строки названия предмета и его уровня.
      * @param array $array
      * @return array|null
      */
-    public static function trimArrayForElastic(array $array): array|null
+    protected function trimArrayForElastic(array $array): array|null
     {
         $trimArray = [];
         foreach (array_slice($array, 1) as $item){
@@ -24,7 +24,7 @@ class TrimArray
      * @param array $array
      * @return array
      */
-    public static function getStatTypeAndCityName(array $array): array
+    protected function getStatTypeAndCityName(array $array): array
     {
         $statTypeAndCityName = [];
         for($i=1; $i<count($array); $i++){

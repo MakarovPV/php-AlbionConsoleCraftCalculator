@@ -14,7 +14,7 @@ abstract class Elastic
 
     public function __construct()
     {
-        $this->client = ClientBuilder::create()->setHosts(['localhost:9200'])->build();
+        $this->client = ClientBuilder::create()->setHosts(['elasticsearch:9200'])->build();
     }
 
     protected function setIndex(string $indexName)

@@ -13,7 +13,7 @@ abstract class Command implements CommandInterface
     protected string $fileNameWithData;
 
     /**
-     * Установка нужного эластик-индекса и файла, из которого в этот индекс убудут добавляться данные.
+     * Установка нужного эластик-индекса и файла, из которого в этот индекс будут добавляться данные.
      * @param Elastic $elastic
      * @param string $fileNameWithData
      */

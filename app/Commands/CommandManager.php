@@ -7,7 +7,7 @@ namespace App\Commands;
  */
 class CommandManager
 {
-    private array $commands = [];
+    private array $commands;
 
     public function __construct(array $commandsArray)
     {

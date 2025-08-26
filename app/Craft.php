@@ -16,6 +16,7 @@ class Craft
     private string $statisticType;
     private string $cityName;
     private Statistic $statistic;
+    private XMLDataItemList $xml;
 
     /**
      * На вход получаем строку, введенную пользователем в консоль.
@@ -24,12 +25,15 @@ class Craft
     public function __construct(array $arrayFromConsole)
     {
         $parameters = new Preparation($arrayFromConsole);
+        $this->xml = new XMLDataItemList();
 
         $this->countOfItems = $parameters->countOfItems;
         $this->itemNamesFromInput = $parameters->itemNamesFromInput;
         $this->itemTier = $parameters->itemTier;
         $this->statisticType = $parameters->statisticType;
         $this->cityName = $parameters->cityName;
+
+        $this->itemNamesFromElastic = $this->getItemNamesFromElastic(new Items());
     }
 
     /**
@@ -47,9 +51,13 @@ class Craft
      */
     private function getStatistic(): string
     {
-        $this->statistic = new $this->statisticType($this->getGeneratedItems(new XMLDataItemList()), $this->cityName);
-        $this->statistic->dataOfMainItem($this->itemNamesFromElastic);
-        return $this->statistic->build();
+        if(substr($this->statisticType, strrpos($this->statisticType, '\\') + 1) == 'FullStatistic'){
+            $this->statistic = new $this->statisticType($this->cityName, $this->getGeneratedItems());
+        } else {
+            $this->statistic = new $this->statisticType($this->cityName);
+        }
+
+        return $this->statistic->build($this->xml->getAmountCraftedItems($this->itemNamesFromElastic['uniqueName']), $this->itemNamesFromElastic);
     }
 
     /**
@@ -57,11 +65,10 @@ class Craft
      * @param XMLData $items
      * @return array
      */
-    private function getGeneratedItems(XMLData $items): array
+    private function getGeneratedItems(): array
     {
-        $this->itemNamesFromElastic = $this->getItemNamesFromElastic(new Items());
-        $items->generateItems($this->itemNamesFromElastic['uniqueName'], $this->countOfItems);
-        return $items->getGeneratedData();
+        $this->xml->generateItems($this->itemNamesFromElastic['uniqueName'], $this->countOfItems);
+        return $this->xml->getGeneratedData();
     }
 
     /**

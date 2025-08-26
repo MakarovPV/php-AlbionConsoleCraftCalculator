@@ -31,4 +31,10 @@ trait Calculate
 
         return $difference;
     }
+
+    protected function calculateCostWithReturn(int $totalCost, float $returnPercent): float
+    {
+        $multiplier = 1 - ($returnPercent / 100);
+        return $totalCost * $multiplier;
+    }
 }

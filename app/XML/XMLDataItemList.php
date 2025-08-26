@@ -51,4 +51,23 @@ class XMLDataItemList extends XMLData
         }
         return false;
     }
+
+    /**
+     * Получение количества предметов, производимых за одну итерацию.
+     * @param string $itemName
+     * @return int
+     */
+    public function getAmountCraftedItems(string $itemName): int
+    {
+        foreach ($this->itemTypes as $item) {
+            $amountCrafted = $this->xml->xpath("//$item
+                                                [@uniquename='$itemName']
+                                                /craftingrequirements[1]
+                                                /@amountcrafted");
+            if ($amountCrafted) {
+                return (int) $amountCrafted[0];
+            }
+        }
+        return 1;
+    }
 }

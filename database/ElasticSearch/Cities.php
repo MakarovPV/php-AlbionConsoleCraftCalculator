@@ -69,4 +69,34 @@ class Cities extends Elastic
 
         return null;
     }
+
+    /**
+     * Получение всех названий городов на английском.
+     * @return array
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
+     */
+    public function getAllCitiesEngNames(): array
+    {
+        $params = [
+            'index' => $this->getIndex(),
+            'body'  => [
+                '_source' => ['cityName.EN-US'],
+                'query' => [
+                    'match_all' => (object)[]
+                ]
+            ]
+        ];
+
+        $response = $this->client->search($params);
+
+        $cities = [];
+        foreach ($response['hits']['hits'] as $hit) {
+            if (isset($hit['_source']['cityName']['EN-US'])) {
+                $cities[] = $hit['_source']['cityName']['EN-US'];
+            }
+        }
+
+        return $cities;
+    }
 }

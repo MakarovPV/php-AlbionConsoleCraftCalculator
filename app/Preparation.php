@@ -43,7 +43,7 @@ class Preparation
 
         return [
             'statisticType' => $this->getStatisticTypeNameFromInput($statisticType),
-            'cityName' => $this->getEngCityName($this->getCityNameFromInput($cityName))
+            'cityName' => $this->getCityNameFromInput($cityName)
         ];
     }
 
@@ -58,16 +58,13 @@ class Preparation
         return false;
     }
 
-    private function getEngCityName(string $cityName): string
+    private function getCityNameFromInput(?string $cityName): array
     {
         $cities = new Cities();
-        return $cities->search([$cityName])['enName'];
-    }
-
-    private function getCityNameFromInput(?string $cityName): string
-    {
-        if(!$cityName) $cityName = 'Thetford';
-        return $cityName;
+        if($cityName == 'all'){
+            return $cities->getAllCitiesEngNames();
+        }
+        return [$cities->search([$cityName])['enName']];
     }
 
     public function __get(string $parameterName): mixed

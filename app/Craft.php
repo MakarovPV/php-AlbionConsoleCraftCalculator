@@ -14,7 +14,7 @@ class Craft
     private array $itemNamesFromElastic;
     private string $itemTier;
     private string $statisticType;
-    private string $cityName;
+    private array $cityName;
     private Statistic $statistic;
     private XMLDataItemList $xml;
 
@@ -51,24 +51,10 @@ class Craft
      */
     private function getStatistic(): string
     {
-        if(substr($this->statisticType, strrpos($this->statisticType, '\\') + 1) == 'FullStatistic'){
-            $this->statistic = new $this->statisticType($this->cityName, $this->getGeneratedItems());
-        } else {
-            $this->statistic = new $this->statisticType($this->cityName);
-        }
-
-        return $this->statistic->build($this->xml->getAmountCraftedItems($this->itemNamesFromElastic['uniqueName']), $this->itemNamesFromElastic);
-    }
-
-    /**
-     * Генерация данных по комплектующим предметам из xml-файла.
-     * @param XMLData $items
-     * @return array
-     */
-    private function getGeneratedItems(): array
-    {
-        $this->xml->generateItems($this->itemNamesFromElastic['uniqueName'], $this->countOfItems);
-        return $this->xml->getGeneratedData();
+        $this->statistic = new $this->statisticType($this->cityName);
+        return $this->statistic->build($this->countOfItems,
+            $this->xml->getAmountCraftedItems($this->itemNamesFromElastic['uniqueName']),
+            $this->itemNamesFromElastic);
     }
 
     /**

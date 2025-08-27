@@ -5,11 +5,11 @@ namespace App\Statistics;
 
 class DefaultStatistic extends Statistic
 {
-    public function __construct(string $cityName)
+    public function __construct(array $cityName = [])
     {
         parent::__construct();
         $this->cityName = $cityName;
-        $this->prev = new ShortStatistic($cityName);
+        $this->prev = new ShortStatistic();
     }
 
     /**
@@ -17,12 +17,16 @@ class DefaultStatistic extends Statistic
      * @param array $namesOfMainItem
      * @return void
      */
-    public function build(int $amountItems, array $namesOfMainItem): string
+    public function build(int $countOfIteration, int $amountItemsPerIteration, array $namesOfMainItem): string
     {
-        $str = 'Предмет ' . $namesOfMainItem['rusName'] . ' крафтится в количестве ' . $amountItems . ' единиц.' . "\n\n";
-        $str .= $this->prev->build($amountItems, $namesOfMainItem);
-        $str .= 'Стоимость с 4% налогом за ' . $amountItems . ' предметов: ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 4)  . " серебра.\n" .
-            'Стоимость с 6.5% налогом за ' . $amountItems . ' предметов: ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 6.5)  . " серебра.\n";
+        $str = 'Предмет ' . $namesOfMainItem['rusName'] . ' крафтится в количестве ' . $amountItemsPerIteration . ' единиц.' . "\n\n";
+
+        foreach ($this->cityName as $city) {
+            $this->prev->setCityName($city);
+            $str .= $this->prev->build($countOfIteration, $amountItemsPerIteration, $namesOfMainItem);
+            $str .= 'Стоимость с 4% налогом за ' . $amountItemsPerIteration . ' предметов в городе ' . $city . ': ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 4) . " серебра.\n" .
+                'Стоимость с 6.5% налогом за ' . $amountItemsPerIteration . ' предметов в городе ' . $city . ': ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 6.5) . " серебра.\n\n";
+        }
         return $str;
 
     }

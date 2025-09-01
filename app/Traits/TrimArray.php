@@ -13,8 +13,12 @@ trait TrimArray
     {
         $trimArray = [];
         foreach (array_slice($array, 1) as $item){
-            $trimArray[] = $item;
-            if(is_numeric($item)) return $trimArray;
+            if(is_numeric($item)){
+                $trimArray['tier'] = (string) round($item);
+                $trimArray['enchant'] = (string) round(($item - floor($item)) * 10);
+                return $trimArray;
+            }
+            $trimArray['itemNames'][] = $item;
         }
         return null;
     }

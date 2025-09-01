@@ -12,22 +12,23 @@ abstract class Statistic
 {
     use Calculate;
 
-    protected string|array $cityName;
-    private AlbionResourceCost $api;
-    private Items $elastic;
+    protected array $cityNames;
     protected int $mainItemCost = 0;
     protected Statistic $prev;
-    protected XMLDataItemList $xml;
+    private XMLDataItemList $xml;
+    private AlbionResourceCost $api;
+    private Items $elasticItems;
 
     /**
      * Первым аргументом передаётся массив со сгенерированными данными из xml-файла.
      * @param array $itemsArray
      * @param string $cityName
      */
-    public function __construct(array $cityName = [])
+    public function __construct(array $cityNames = [])
     {
+        $this->cityNames = $cityNames;
         $this->api = new AlbionResourceCost();
-        $this->elastic = new Items();
+        $this->elasticItems = new Items();
         $this->xml = new XMLDataItemList();
     }
 
@@ -47,12 +48,7 @@ abstract class Statistic
 
     protected function getRusNameFromElastic(string $uniqueName)
     {
-        $tier = substr($uniqueName, 1, 1);
-        return $this->elastic->search(
-            [
-                'itemNames' => [$uniqueName],
-                'tier' => $tier
-            ])['rusName'];
+        return $this->elasticItems->getRusItemName($uniqueName);
     }
 
     /**
@@ -69,6 +65,6 @@ abstract class Statistic
 
     protected function setCityName(string $cityName)
     {
-        $this->cityName = [$cityName];
+        $this->cityNames = [$cityName];
     }
 }

@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Statistics\Statistic;
-use App\XML\XMLData;
 use App\XML\XMLDataItemList;
 use Database\ElasticSearch\Items;
 
@@ -13,8 +12,9 @@ class Craft
     private array $itemNamesFromInput;
     private array $itemNamesFromElastic;
     private string $itemTier;
+    private string $itemEnchant;
     private string $statisticType;
-    private array $cityName;
+    private array $cityNames;
     private Statistic $statistic;
     private XMLDataItemList $xml;
 
@@ -30,8 +30,9 @@ class Craft
         $this->countOfItems = $parameters->countOfItems;
         $this->itemNamesFromInput = $parameters->itemNamesFromInput;
         $this->itemTier = $parameters->itemTier;
+        $this->itemEnchant = $parameters->itemEnchant;
         $this->statisticType = $parameters->statisticType;
-        $this->cityName = $parameters->cityName;
+        $this->cityNames = $parameters->cityNames;
 
         $this->itemNamesFromElastic = $this->getItemNamesFromElastic(new Items());
     }
@@ -51,7 +52,7 @@ class Craft
      */
     private function getStatistic(): string
     {
-        $this->statistic = new $this->statisticType($this->cityName);
+        $this->statistic = new $this->statisticType($this->cityNames);
         return $this->statistic->build($this->countOfItems,
             $this->xml->getAmountCraftedItems($this->itemNamesFromElastic['uniqueName']),
             $this->itemNamesFromElastic);
@@ -67,7 +68,8 @@ class Craft
         $result = $albionItems->search(
             [
                 'itemNames' => $this->itemNamesFromInput,
-                'tier' => $this->itemTier
+                'tier' => $this->itemTier,
+                'enchant' => $this->itemEnchant
             ]);
 
         return $result;

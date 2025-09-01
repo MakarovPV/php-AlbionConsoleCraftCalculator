@@ -9,7 +9,7 @@ use Elastic\Elasticsearch\ClientBuilder;
  */
 abstract class Elastic
 {
-    public $client;
+    protected $client;
     private string $indexName;
 
     public function __construct()

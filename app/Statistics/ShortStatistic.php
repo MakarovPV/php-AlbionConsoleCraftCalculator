@@ -4,10 +4,9 @@ namespace App\Statistics;
 
 class ShortStatistic extends Statistic
 {
-    public function __construct(array $cityName = [])
+    public function __construct(array $cityNames = [])
     {
-        parent::__construct();
-        $this->cityName = $cityName;
+        parent::__construct($cityNames);
     }
 
     /**
@@ -16,7 +15,7 @@ class ShortStatistic extends Statistic
     public function build(int $countOfIteration, int $amountItemsPerIteration, array $namesOfMainItem): string
     {
         $str = '';
-        foreach ($this->cityName as $city){
+        foreach ($this->cityNames as $city){
             $this->mainItemCost = $this->calculate($amountItemsPerIteration, $this->getItemCostFromApi($namesOfMainItem['uniqueName'], $city));
             $str .= 'Стоимость ' . $amountItemsPerIteration . ' предметов ' . $namesOfMainItem['rusName'] . ' в городе ' . $city . ' составляет ' . $this->mainItemCost . " серебра.\n";
 

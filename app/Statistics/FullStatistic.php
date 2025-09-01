@@ -4,10 +4,9 @@ namespace App\Statistics;
 
 class FullStatistic extends Statistic
 {
-    public function __construct(array $cityName = [])
+    public function __construct(array $cityNames = [])
     {
-        parent::__construct();
-        $this->cityName = $cityName;
+        parent::__construct($cityNames);
         $this->prev = new DefaultStatistic();
     }
 
@@ -17,10 +16,9 @@ class FullStatistic extends Statistic
     public function build(int $countOfIteration, int $amountItemsPerIteration, array $namesOfMainItem): string
     {
         $str = '';
-        foreach ($this->cityName as $city) {
+        foreach ($this->cityNames as $city) {
             $this->prev->setCityName($city);
             $str .= $this->prev->build($countOfIteration, $amountItemsPerIteration, $namesOfMainItem);
-
             $itemsArray = $this->getGeneratedItems($countOfIteration, $namesOfMainItem['uniqueName']);
 
             $str .= "Поиск данных по ресурсам для его создания:\n";

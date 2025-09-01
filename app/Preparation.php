@@ -26,10 +26,11 @@ class Preparation
 
         $this->parameters = [
             'countOfItems' => $inputDataArray[0],
-            'itemTier' => array_pop($itemNamesAndTier),
-            'itemNamesFromInput' => $itemNamesAndTier,
+            'itemTier' => $itemNamesAndTier['tier'],
+            'itemNamesFromInput' => $itemNamesAndTier['itemNames'],
             'statisticType' => $cityAndStat['statisticType'],
-            'cityName' => $cityAndStat['cityName']
+            'cityNames' => $cityAndStat['cityNames'],
+            'itemEnchant' => $itemNamesAndTier['enchant']
         ];
     }
 
@@ -43,7 +44,7 @@ class Preparation
 
         return [
             'statisticType' => $this->getStatisticTypeNameFromInput($statisticType),
-            'cityName' => $this->getCityNameFromInput($cityName)
+            'cityNames' => $this->getEngCityNamesFromElasticByInput($cityName)
         ];
     }
 
@@ -58,13 +59,16 @@ class Preparation
         return false;
     }
 
-    private function getCityNameFromInput(?string $cityName): array
+    private function getEngCityNamesFromElasticByInput(string $cityName): array
     {
         $cities = new Cities();
-        if($cityName == 'all'){
-            return $cities->getAllCitiesEngNames();
-        }
-        return [$cities->search([$cityName])['enName']];
+        return $cities->getEngCityNames($cityName);
+    }
+
+    private function getItemTier(array $tierAndEnchant): string
+    {
+
+        return array_pop($tierAndEnchant)[0];
     }
 
     public function __get(string $parameterName): mixed
@@ -76,6 +80,4 @@ class Preparation
     {
         return $this->parameters[$parameterName];
     }
-
-
 }

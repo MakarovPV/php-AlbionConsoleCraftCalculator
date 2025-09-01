@@ -5,10 +5,9 @@ namespace App\Statistics;
 
 class DefaultStatistic extends Statistic
 {
-    public function __construct(array $cityName = [])
+    public function __construct(array $cityNames = [])
     {
-        parent::__construct();
-        $this->cityName = $cityName;
+        parent::__construct($cityNames);
         $this->prev = new ShortStatistic();
     }
 
@@ -21,7 +20,7 @@ class DefaultStatistic extends Statistic
     {
         $str = 'Предмет ' . $namesOfMainItem['rusName'] . ' крафтится в количестве ' . $amountItemsPerIteration . ' единиц.' . "\n\n";
 
-        foreach ($this->cityName as $city) {
+        foreach ($this->cityNames as $city) {
             $this->prev->setCityName($city);
             $str .= $this->prev->build($countOfIteration, $amountItemsPerIteration, $namesOfMainItem);
             $str .= 'Стоимость с 4% налогом за ' . $amountItemsPerIteration . ' предметов в городе ' . $city . ': ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 4) . " серебра.\n" .

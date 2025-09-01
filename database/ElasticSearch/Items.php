@@ -16,15 +16,31 @@ class Items extends Elastic
         !empty($array['LocalizedNames']['EN-US']) ? $engName = $array['LocalizedNames']['EN-US'] : $engName = 'описание предмета отсутствует';
         $this->client->index([
             'index' => $this->getIndex(),
-            'id'    => $array['Index'],
-            'body'  => [
-                'uniqueName'  => $array['UniqueName'],
+            'id' => $array['Index'],
+            'body' => [
+                'uniqueName' => $array['UniqueName'],
                 'localizedNames' => [
                     'EN-US' => $engName,
                     'RU-RUS' => $russianName
                 ]
             ]
         ]);
+    }
+
+    /**
+     * @param string $uniqueName
+     * @return mixed
+     */
+    public function getRusItemName(string $uniqueName)
+    {
+        $tier = substr($uniqueName, 1, 1);
+        $enchant = is_numeric($uniqueName[-1]) ? substr($uniqueName, -1, 1) : 0;
+        return $this->search(
+            [
+                'itemNames' => [$uniqueName],
+                'tier' => $tier,
+                'enchant' => $enchant
+            ])['rusName'];
     }
 
     /**
@@ -35,28 +51,23 @@ class Items extends Elastic
      */
     public function search(array $itemNamesAndTier): array|null
     {
-        $itemNames = $itemNamesAndTier['itemNames'];
-        $tierItem = $itemNamesAndTier['tier'];
+        list('itemNames' => $itemNames, 'tier' => $tierItem, 'enchant' => $enchant) = $itemNamesAndTier;
 
         $params = [
             'index' => $this->getIndex(),
-            'body'  => [
+            'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [
-                            [
-                                'bool' => [
-                                    'should' => []
-                                ]
-                            ]
-                        ]
+                        'must' => [],
+                        'filter' => []
                     ]
                 ]
             ]
         ];
 
+        // Поиск по словам
         foreach ($itemNames as $itemName) {
-            $params['body']['query']['bool']['should'][] = [
+            $params['body']['query']['bool']['must'][] = [
                 'multi_match' => [
                     'query' => $itemName,
                     'fields' => [
@@ -64,8 +75,19 @@ class Items extends Elastic
                         'uniqueName',
                         'localizedNames.EN-US'
                     ],
-                    'type' => 'phrase'
                 ]
+            ];
+        }
+
+        // Фильтр по тиру
+        $params['body']['query']['bool']['filter'][] = [
+            'prefix' => ['uniqueName.keyword' => 'T' . $tierItem . '_']
+        ];
+
+        // Фильтр по зачарованию
+        if ($enchant > 0) {
+            $params['body']['query']['bool']['filter'][] = [
+                'wildcard' => ['uniqueName.keyword' => '*@' . $enchant]
             ];
         }
 
@@ -73,14 +95,13 @@ class Items extends Elastic
 
         foreach ($response['hits']['hits'] as $hit) {
             if (isset($hit['_source']['uniqueName'])) {
-                $localizedName = $hit['_source']['localizedNames']["RU-RUS"];
+                $localizedName = $hit['_source']['localizedNames']["RU-RUS"] ?? '';
                 $uniqueName = $hit['_source']['uniqueName'];
-                if ($uniqueName[1] === $tierItem) {
-                    return [
-                        'uniqueName' => $uniqueName,
-                        'rusName' => $localizedName
-                    ];
-                }
+
+                return [
+                    'uniqueName' => $uniqueName,
+                    'rusName' => $localizedName
+                ];
             }
         }
 

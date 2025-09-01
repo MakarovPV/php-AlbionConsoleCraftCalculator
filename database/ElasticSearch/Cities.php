@@ -71,6 +71,20 @@ class Cities extends Elastic
     }
 
     /**
+     * @param string $cityName
+     * @return array
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
+     */
+    public function getEngCityNames(string $cityName): array
+    {
+        if($cityName == 'all'){
+            return $this->getAllCitiesEngNames();
+        }
+        return [$this->search([$cityName])['enName']];
+    }
+
+    /**
      * Получение всех названий городов на английском.
      * @return array
      * @throws \Elastic\Elasticsearch\Exception\ClientResponseException

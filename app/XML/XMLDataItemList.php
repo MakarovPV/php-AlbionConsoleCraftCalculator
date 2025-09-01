@@ -13,14 +13,31 @@ class XMLDataItemList extends XMLData
     {
         parent::__construct('data/items.xml');
     }
-
+    
     /**
      * Заполнение массива данными по искомому предмету и его комплектующим из xml-файла.
      * @param string $searchValue
      * @param int $count
-     * @return string
+     * @return string|void
      */
     public function generateItems(string $searchValue, int $count)
+    {
+        $itemType = $this->selectItemType($searchValue);
+
+        if(!$itemType) return;
+
+        foreach ($itemType as $resource) {
+            $this->generatedData[(string)$resource['uniquename']] = $resource['count'] * $count;
+        }
+    }
+
+    /**
+     * Более глубокое заполнение массива данными по искомому предмету, его комплектующим и комплектующим его комплектующих из xml-файла.
+     * @param string $searchValue
+     * @param int $count
+     * @return string
+     */
+    public function deepGenerateItems(string $searchValue, int $count)
     {
         $itemType = $this->selectItemType($searchValue);
 
@@ -41,6 +58,14 @@ class XMLDataItemList extends XMLData
      */
     private function selectItemType(string $searchValue): array|false
     {
+        if(is_numeric($searchValue[-1])){
+            return $this->getEnchantItemDataByTag($searchValue);
+        }
+        return $this->getCommonItemDataByTag($searchValue);
+    }
+
+    private function getCommonItemDataByTag(string $searchValue): array|false
+    {
         foreach ($this->itemTypes as $item){
             $foundItems = $this->xml->xpath("//$item
                                             [@uniquename='$searchValue']
@@ -50,6 +75,25 @@ class XMLDataItemList extends XMLData
             if(!empty($foundItems)) return $foundItems;
         }
         return false;
+    }
+
+    private function getEnchantItemDataByTag(string $searchValue): array|false
+    {
+        $enchantLevel =  $searchValue[-1];
+        $searchValue = substr($searchValue, 0, -2);
+
+        foreach ($this->itemTypes as $item){
+            $foundItems = $this->xml->xpath("//$item
+                                            [@uniquename='$searchValue']
+                                            /enchantments
+                                            /enchantment[@enchantmentlevel='$enchantLevel']
+                                            /craftingrequirements
+                                            /craftresource");
+
+            if(!empty($foundItems)) return $foundItems;
+        }
+
+        return $this->getCommonItemDataByTag($searchValue);
     }
 
     /**

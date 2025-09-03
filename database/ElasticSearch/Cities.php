@@ -2,6 +2,10 @@
 
 namespace Database\ElasticSearch;
 
+use App\DTO\Cities\CitySearchDTO;
+use App\DTO\DTO;
+use App\Exceptions\City\CityWrongNameException;
+
 class Cities extends Elastic
 {
     public function __construct()
@@ -24,15 +28,22 @@ class Cities extends Elastic
         ]);
     }
 
+
     /**
      * Поиск города в эластике. Во входящем массиве содержится либо сокращенное русское название города, либо уже полное английское.
      * При нахождении получаем массив с его наименованием на русском и английском языках.
      * Английское название используется для получения по нему данных из API.
-     * @param array $cityName
+     * @param CitySearchDTO $city
      * @return array|null
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
      */
-    public function search(array $cityName): array|null
+    public function search(DTO $city): array
     {
+        if (!$city instanceof CitySearchDTO) {
+            throw new \InvalidArgumentException();
+        }
+
         $params = [
             'index' => $this->getIndex(),
             'body'  => [
@@ -41,7 +52,7 @@ class Cities extends Elastic
                         'should' => [
                             [
                                 'multi_match' => [
-                                    'query' => $cityName[0],
+                                    'query' => $city->cityName,
                                     'fields' => [
                                         'cityName.EN-US',
                                         'cityName.RU-RUS'
@@ -67,7 +78,7 @@ class Cities extends Elastic
             }
         }
 
-        return null;
+        throw new CityWrongNameException($city->cityName);
     }
 
     /**
@@ -81,7 +92,10 @@ class Cities extends Elastic
         if($cityName == 'all'){
             return $this->getAllCitiesEngNames();
         }
-        return [$this->search([$cityName])['enName']];
+
+        $result = $this->search(new CitySearchDTO($cityName));
+
+        return [$result['enName']];
     }
 
     /**

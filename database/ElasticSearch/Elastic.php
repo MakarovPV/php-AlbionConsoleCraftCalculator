@@ -2,6 +2,7 @@
 
 namespace Database\ElasticSearch;
 
+use App\DTO\DTO;
 use Elastic\Elasticsearch\ClientBuilder;
 
 /**
@@ -58,16 +59,17 @@ abstract class Elastic
     }
 
     /**
-     * Добавление одного документа в индекс.
+     * Добавление одного документа в индекс по данным из json-файла.
      * @param array $array
      * @return void
      */
     abstract public function insert(array $array);
 
+
     /**
      * Поиск документа в индексе.
-     * @param array $params
-     * @return array|null
+     * @param DTO $params
+     * @return array
      */
-    abstract public function search(array $params): array|null;
+    abstract public function search(DTO $params): array;
 }

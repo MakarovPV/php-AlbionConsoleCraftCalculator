@@ -2,7 +2,9 @@
 
 namespace App;
 
-use App\Traits\TrimArray;
+use App\Exceptions\Item\ItemEmptyTierException;
+use App\Validators\CityValidator;
+use App\Validators\ItemValidator;
 use Database\ElasticSearch\Cities;
 
 /**
@@ -10,7 +12,6 @@ use Database\ElasticSearch\Cities;
  */
 class Preparation
 {
-    use TrimArray;
 
     private array $parameters = [];
 
@@ -21,55 +22,98 @@ class Preparation
 
     public function extractParametersFromConsoleInput(array $inputDataArray): void
     {
-        $itemNamesAndTier = $this->trimArrayForElastic($inputDataArray);
-        $cityAndStat = $this->getStatisticTypeAndCityName($this->getStatTypeAndCityName($inputDataArray));
+        $countOfItems = $inputDataArray[0];
+        ItemValidator::notEmptyCountOfItems((int)$countOfItems);
+        ItemValidator::correctCountOfItems((int)$countOfItems);
+
+        $itemNamesAndTier = $this->getFirstPartOfInput($inputDataArray);
+        $cityAndStatType = $this->getStatisticTypeAndCityName($this->getSecondPartOfInput($inputDataArray));
 
         $this->parameters = [
-            'countOfItems' => $inputDataArray[0],
+            'countOfItems' => $countOfItems,
             'itemTier' => $itemNamesAndTier['tier'],
             'itemNamesFromInput' => $itemNamesAndTier['itemNames'],
-            'statisticType' => $cityAndStat['statisticType'],
-            'cityNames' => $cityAndStat['cityNames'],
-            'itemEnchant' => $itemNamesAndTier['enchant']
+            'itemEnchant' => $itemNamesAndTier['enchant'],
+            'statisticType' => $cityAndStatType['statisticType'],
+            'cityNames' => $cityAndStatType['cityNames']
         ];
+    }
+
+    /**
+     * Извлечение первой части вхдящей строки, включающей в себя название предмета, его тир и уровень зачарования.
+     * @param array $array
+     * @return array
+     */
+    private function getFirstPartOfInput(array $array): array
+    {
+        $trimArray = [];
+        foreach (array_slice($array, 1) as $item){
+            if(is_numeric($item)){
+                $trimArray['tier'] = (string) round($item);
+                ItemValidator::correctTier($trimArray['tier']);
+                $trimArray['enchant'] = (string) round(($item - floor($item)) * 10);
+                ItemValidator::correctEnchant($trimArray['enchant']);
+                ItemValidator::notEmptyName('itemNames', $trimArray);
+                return $trimArray;
+            }
+            $trimArray['itemNames'][] = $item;
+        }
+        throw new ItemEmptyTierException();
+    }
+
+    /**
+     * Извлечение второй части вхдящей строки, включающей в себя название города и тип статистики.
+     * @param array $array
+     * @return array
+     */
+    private function getSecondPartOfInput(array $array): array
+    {
+        $statTypeAndCityName = [];
+        for($i=1; $i<count($array); $i++){
+            if(is_numeric($array[$i])){
+                $statTypeAndCityName = array_slice($array, $i+1, 2);
+                break;
+            }
+        }
+        return array_merge($statTypeAndCityName, array_fill(0, 2 - count($statTypeAndCityName), null));
     }
 
     public function getStatisticTypeAndCityName(array $array): array
     {
-        if($this->getStatisticTypeNameFromInput($array[0])) {
+        if($this->getStatisticTypeClassNameFromInput($array[0])) {
             list($statisticType, $cityName) = $array;
         } else {
             list($cityName, $statisticType) = $array;
         }
 
         return [
-            'statisticType' => $this->getStatisticTypeNameFromInput($statisticType),
+            'statisticType' => $this->getStatisticTypeClassNameFromInput($statisticType),
             'cityNames' => $this->getEngCityNamesFromElasticByInput($cityName)
         ];
     }
 
-    private function getStatisticTypeNameFromInput(?string $statisticType): string|false
+
+    private function getStatisticTypeClassNameFromInput(?string $statisticType): string|false
     {
         if(!$statisticType) $statisticType = 'default';
-        $className = "\App\Statistics\\".ucfirst($statisticType) . 'Statistic';
+        $className = "\App\Statistics\\" . ucfirst($statisticType) . 'Statistic';
 
         if (class_exists($className)) {
             return $className;
         }
+
         return false;
     }
 
-    private function getEngCityNamesFromElasticByInput(string $cityName): array
+    private function getEngCityNamesFromElasticByInput(?string $cityName): array
     {
+        CityValidator::notEmpty($cityName);
+
         $cities = new Cities();
+
         return $cities->getEngCityNames($cityName);
     }
 
-    private function getItemTier(array $tierAndEnchant): string
-    {
-
-        return array_pop($tierAndEnchant)[0];
-    }
 
     public function __get(string $parameterName): mixed
     {

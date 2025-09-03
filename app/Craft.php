@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\DTO\Items\ItemSearchDTO;
+use App\DTO\Statistics\StatisticBuildDTO;
 use App\Statistics\Statistic;
 use App\XML\XMLDataItemList;
 use Database\ElasticSearch\Items;
@@ -10,13 +12,20 @@ class Craft
 {
     private string $countOfItems;
     private array $itemNamesFromInput;
-    private array $itemNamesFromElastic;
     private string $itemTier;
     private string $itemEnchant;
     private string $statisticType;
     private array $cityNames;
+
+    /**
+     * Массив с полными именами предмета (на русском и английском) по полученным названию и уровню предмета из консоли.
+     * @var array|null
+     */
+    private array $itemNamesFromElastic;
+
     private Statistic $statistic;
     private XMLDataItemList $xml;
+    private Items $items;
 
     /**
      * На вход получаем строку, введенную пользователем в консоль.
@@ -26,6 +35,7 @@ class Craft
     {
         $parameters = new Preparation($arrayFromConsole);
         $this->xml = new XMLDataItemList();
+        $this->items = new Items();
 
         $this->countOfItems = $parameters->countOfItems;
         $this->itemNamesFromInput = $parameters->itemNamesFromInput;
@@ -34,7 +44,7 @@ class Craft
         $this->statisticType = $parameters->statisticType;
         $this->cityNames = $parameters->cityNames;
 
-        $this->itemNamesFromElastic = $this->getItemNamesFromElastic(new Items());
+        $this->itemNamesFromElastic = $this->items->search(new ItemSearchDTO($this->itemNamesFromInput, $this->itemTier, $this->itemEnchant));
     }
 
     /**
@@ -52,26 +62,11 @@ class Craft
      */
     private function getStatistic(): string
     {
-        $this->statistic = new $this->statisticType($this->cityNames);
-        return $this->statistic->build($this->countOfItems,
+        $dataForStatistic = new StatisticBuildDTO($this->countOfItems,
             $this->xml->getAmountCraftedItems($this->itemNamesFromElastic['uniqueName']),
             $this->itemNamesFromElastic);
-    }
 
-    /**
-     * Получение массива с полными именами предмета (на русском и английском) по полученным названию и уровню предмета из консоли.
-     * @param Items $albionItems
-     * @return array|null
-     */
-    private function getItemNamesFromElastic(Items $albionItems): array|null
-    {
-        $result = $albionItems->search(
-            [
-                'itemNames' => $this->itemNamesFromInput,
-                'tier' => $this->itemTier,
-                'enchant' => $this->itemEnchant
-            ]);
-
-        return $result;
+        $this->statistic = new $this->statisticType($this->cityNames);
+        return $this->statistic->build($dataForStatistic);
     }
 }

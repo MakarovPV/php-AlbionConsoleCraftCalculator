@@ -2,6 +2,10 @@
 
 namespace Database\ElasticSearch;
 
+use App\DTO\DTO;
+use App\DTO\Items\ItemSearchDTO;
+use App\Exceptions\Item\ItemWrongNameException;
+
 class Items extends Elastic
 {
     public function __construct()
@@ -35,23 +39,25 @@ class Items extends Elastic
     {
         $tier = substr($uniqueName, 1, 1);
         $enchant = is_numeric($uniqueName[-1]) ? substr($uniqueName, -1, 1) : 0;
-        return $this->search(
-            [
-                'itemNames' => [$uniqueName],
-                'tier' => $tier,
-                'enchant' => $enchant
-            ])['rusName'];
+        return $this->search(new ItemSearchDTO($uniqueName, $tier, $enchant))['rusName'];
     }
+
 
     /**
      * Поиск предмета в эластике. Входящий массив содержит в себе название искомого предмета из 1 или нескольких слов и его уровень.
      * При нахождении получаем массив с его наименованием на русском языке и уникальным именем для получения по нему данных из API.
-     * @param array $itemNamesAndTier
+     * @param ItemSearchDTO $itemData
      * @return array|null
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
      */
-    public function search(array $itemNamesAndTier): array|null
+    public function search(DTO $itemData): array
     {
-        list('itemNames' => $itemNames, 'tier' => $tierItem, 'enchant' => $enchant) = $itemNamesAndTier;
+        if (!$itemData instanceof ItemSearchDTO) throw new \InvalidArgumentException();
+
+        $itemNames = $itemData->itemNames;
+        $tier = $itemData->tier;
+        $enchant = $itemData->enchant;
 
         $params = [
             'index' => $this->getIndex(),
@@ -81,7 +87,7 @@ class Items extends Elastic
 
         // Фильтр по тиру
         $params['body']['query']['bool']['filter'][] = [
-            'prefix' => ['uniqueName.keyword' => 'T' . $tierItem . '_']
+            'prefix' => ['uniqueName.keyword' => 'T' . $tier . '_']
         ];
 
         // Фильтр по зачарованию
@@ -105,6 +111,6 @@ class Items extends Elastic
             }
         }
 
-        return null;
+        throw new ItemWrongNameException();
     }
 }

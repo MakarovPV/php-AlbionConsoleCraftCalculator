@@ -10,9 +10,9 @@ trait Calculate
      * @param int $costItem
      * @return int
      */
-    protected function calculate(int $countItems, int $costItem): int
+    protected function calculate(int ...$args): int
     {
-        return $countItems * $costItem;
+        return array_product($args);
     }
 
     /**

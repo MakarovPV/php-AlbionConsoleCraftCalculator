@@ -3,6 +3,8 @@
 namespace App\Statistics;
 
 use App\Api\AlbionResourceCost;
+use App\DTO\Statistics\StatisticBuildDTO;
+use App\ReturnPercents;
 use App\Traits\Calculate;
 use App\XML\XMLDataItemList;
 use Database\ElasticSearch\Items;
@@ -39,7 +41,7 @@ abstract class Statistic
      * @param array $namesOfMainItem
      * @return string
      */
-    abstract public function build(int $countOfIteration, int $amountItemsPerIteration, array $namesOfMainItem): string;
+    abstract public function build(StatisticBuildDTO $data): string;
 
     protected function getItemCostFromApi(string $uniqueName, string $cityName)
     {
@@ -63,8 +65,16 @@ abstract class Statistic
         return $this->xml->getGeneratedData();
     }
 
+    protected function getDataFromPrev(string $city, StatisticBuildDTO $dto): string
+    {
+        $this->prev->setCityName($city);
+        return $this->prev->build($dto);
+    }
+
     protected function setCityName(string $cityName)
     {
         $this->cityNames = [$cityName];
     }
+
+
 }

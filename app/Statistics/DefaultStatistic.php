@@ -4,13 +4,16 @@ namespace App\Statistics;
 
 
 use App\DTO\Statistics\StatisticBuildDTO;
+use App\Statistics\TextBlocks\DefaultStatisticTextBlock;
 
 class DefaultStatistic extends Statistic
 {
     public function __construct(array $cityNames = [])
     {
         parent::__construct($cityNames);
+
         $this->prev = new ShortStatistic();
+        $this->textBlock = new DefaultStatisticTextBlock();
     }
 
     /**
@@ -20,14 +23,23 @@ class DefaultStatistic extends Statistic
      */
     public function build(StatisticBuildDTO $data): string
     {
-        $str = 'Предмет ' . $data->namesOfMainItem['rusName'] . ' крафтится в количестве ' . $data->amountItemsPerIteration . ' единиц.' . "\n\n";
+        $dataForCountOfItems = [
+            'rusName' => $data->namesOfMainItem['rusName'],
+            'amountItems' => $data->amountItemsPerIteration,
+        ];
+        $this->textBlock->countOfItems($dataForCountOfItems);
 
         foreach ($this->cityNames as $city) {
-            $str .= $this->getDataFromPrev($city, $data);
-            $str .= 'Стоимость с 4% налогом за ' . $data->amountItemsPerIteration . ' предметов в городе ' . $city . ': ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 4) . " серебра.\n" .
-                'Стоимость с 6.5% налогом за ' . $data->amountItemsPerIteration . ' предметов в городе ' . $city . ': ' . $this->calculateCostWithReturn($this->prev->mainItemCost, 6.5) . " серебра.\n\n";
-        }
-        return $str;
 
+            $this->textBlock->addText($this->getDataFromPrev($city, $data));
+
+            $dataForItemCost = [
+                'baseCost' => $this->getMainItemCost(),
+                'city' => $city
+            ];
+            $this->textBlock->totalCost($dataForItemCost);
+        }
+
+        return $this->textBlock->getText();
     }
 }

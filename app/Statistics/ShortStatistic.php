@@ -3,12 +3,15 @@
 namespace App\Statistics;
 
 use App\DTO\Statistics\StatisticBuildDTO;
+use App\Statistics\TextBlocks\ShortStatisticTextBlock;
 
 class ShortStatistic extends Statistic
 {
     public function __construct(array $cityNames = [])
     {
         parent::__construct($cityNames);
+
+        $this->textBlock = new ShortStatisticTextBlock();
     }
 
     /**
@@ -16,12 +19,18 @@ class ShortStatistic extends Statistic
      */
     public function build(StatisticBuildDTO $data): string
     {
-        $str = '';
         foreach ($this->cityNames as $city){
             $this->mainItemCost = $this->calculate($data->countOfIteration, $data->amountItemsPerIteration, $this->getItemCostFromApi($data->namesOfMainItem['uniqueName'], $city));
-            $str .= 'Стоимость ' . $data->amountItemsPerIteration . ' предметов ' . $data->namesOfMainItem['rusName'] . ' в городе ' . $city . ' составляет ' . $this->mainItemCost . " серебра.\n";
 
+            $data = [
+                'amountItemsPerIteration' => $data->amountItemsPerIteration,
+                'rusName' => $data->namesOfMainItem['rusName'],
+                'city' => $city,
+                'mainItemCost' => $this->mainItemCost,
+            ];
+
+             $this->textBlock->totalCost($data);
         }
-         return $str;
+        return $this->textBlock->getText();
     }
 }

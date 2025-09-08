@@ -4,11 +4,10 @@ namespace App\Statistics;
 
 use App\Api\AlbionResourceCost;
 use App\DTO\Statistics\StatisticBuildDTO;
-use App\ReturnPercents;
+use App\Statistics\TextBlocks\TextBlock;
 use App\Traits\Calculate;
 use App\XML\XMLDataItemList;
 use Database\ElasticSearch\Items;
-
 
 abstract class Statistic
 {
@@ -17,6 +16,7 @@ abstract class Statistic
     protected array $cityNames;
     protected int $mainItemCost = 0;
     protected Statistic $prev;
+    protected TextBlock $textBlock;
     private XMLDataItemList $xml;
     private AlbionResourceCost $api;
     private Items $elasticItems;
@@ -76,5 +76,12 @@ abstract class Statistic
         $this->cityNames = [$cityName];
     }
 
+    protected function getMainItemCost(): int
+    {
+        if ($this->mainItemCost === 0 && isset($this->prev)){
+            return $this->prev->getMainItemCost();
+        }
 
+        return $this->mainItemCost;
+    }
 }
